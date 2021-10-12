@@ -9,3 +9,4 @@ flask-admin==1.5.8
 pytest==6.2.5
 pytest-mock==3.6.1
 isort==5.9.3
+Flask-JWT==0.3.2

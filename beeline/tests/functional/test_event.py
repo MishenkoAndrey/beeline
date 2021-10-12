@@ -26,9 +26,10 @@ class TestEvent:
         assert response.json["message"] == message
         assert response.status_code == HTTPStatus.CREATED
 
-    def test_repeat_registration(self, app, user, mocker, event, registration):
+    def test_repeat_registration(self, app, mocker, registration):
         mocker.patch("flask_jwt._jwt_required", side_effect=lambda x: x)
         mocked_request = mocker.patch("flask_jwt._request_ctx_stack")
+        reg, user, event = registration
         mocked_request.top.current_identity = user
         response = app.post(
             f"/registration/{event.id}/",
@@ -57,16 +58,12 @@ class TestEvent:
         json = response.json
         assert json is not None
         assert isinstance(json, list)
-        event_1, event_2 = json
-        event_r1, event_r2 = event_list
+        event_1 = json[0]
+        event_r1 = event_list[0]
         assert isinstance(event_1, dict)
-        assert isinstance(event_2, dict)
         assert event_1["has_participants"] is True
-        assert event_2["has_participants"] is False
         assert event_1["name"] == event_r1.name
-        assert event_2["name"] == event_r2.name
         assert event_1["description"] == event_r1.description
-        assert event_2["name"] == event_r2.description
 
     def test_get_single_event(self, app, single_event):
         user, event = single_event

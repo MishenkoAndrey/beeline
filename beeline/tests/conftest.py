@@ -57,50 +57,56 @@ def event(db):
 
 
 @pytest.fixture(scope="session")
-def registration(db, user, event):
+def registration(db):
     Registration.query.delete()
+    User.query.delete()
+    Event.query.delete()
     db.session.commit()
-    print(list(Registration.query.all()), "1233")
+    user = User(name="test", raw_pass="test")
+    event = Event(name="test")
+    db.session.add(user)
+    db.session.add(event)
+    db.session.commit()
     reg = Registration(user_id=user.id, event_id=event.id)
     db.session.add(reg)
     db.session.commit()
-    print(list(Registration.query.all()), "1233")
-    yield reg
-    db.session.delete(reg)
+    yield reg, user, event
+    Registration.query.delete()
+    User.query.delete()
+    Event.query.delete()
     db.session.commit()
 
 
 @pytest.fixture(scope="session")
 def event_list(db):
+    Registration.query.delete()
+    User.query.delete()
+    Event.query.delete()
+    db.session.commit()
     event_1 = Event(
         name="test1",
         description="test1",
         date=dt.now(),
     )
-    event_2 = Event(
-        name="test2",
-        description="test2",
-        date=dt.now(),
-    )
     reg_user = User(name="test_user", raw_pass="test")
     db.session.add(event_1)
-    db.session.add(event_2)
     db.session.add(reg_user)
     db.session.commit()
     reg = Registration(user_id=reg_user.id, event_id=event_1.id)
     db.session.add(reg)
     db.session.commit()
-    yield [event_1, event_2]
-    db.session.delete(reg)
-    db.session.commit()
-    db.session.delete(event_1)
-    db.session.delete(event_2)
-    db.session.delete(reg_user)
+    yield [event_1]
+    Registration.query.delete()
+    User.query.delete()
+    Event.query.delete()
     db.session.commit()
 
 
 @pytest.fixture(scope="session")
 def single_event(db):
+    Registration.query.delete()
+    User.query.delete()
+    db.session.commit()
     event = Event(
         name="single",
         description="single event",
@@ -115,9 +121,8 @@ def single_event(db):
     db.session.commit()
     registration = Registration(user_id=user.id, event_id=event.id)
     db.session.add(registration)
-    yield user, event
-    db.session.delete(registration)
     db.session.commit()
-    db.session.delete(event)
-    db.session.delete(user)
+    yield user, event
+    Registration.query.delete()
+    User.query.delete()
     db.session.commit()

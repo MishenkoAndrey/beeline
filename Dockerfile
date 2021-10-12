@@ -15,5 +15,5 @@ RUN pip install -r requirements.txt
 COPY . /usr/src/app/
 
 EXPOSE 5000
-CMD ["flask", "db", "upgrade"]
-CMD ["gunicorn"  , "-b", "0.0.0.0:5000", "wsgi:app"]
+CMD ["flask", "db", "docker exd"]
+RUN ["gunicorn"  , "-b", "0.0.0.0:5000", "wsgi:app"]
